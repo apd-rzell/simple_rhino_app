@@ -1,6 +1,6 @@
 # app/view/chart.R
 box::use(
-  shiny[h3, moduleServer, NS, tagList, plotOutput, renderPlot],
+  shiny[h3, moduleServer, NS, tagList, plotOutput, renderPlot, sliderInput],
   ggplot2[ggplot, aes, geom_point, geom_smooth, theme_minimal, ggtitle],
   stats[rnorm]
 )
@@ -11,7 +11,8 @@ ui <- function(id) {
   
   tagList(
     h3("Scatter Plot"),
-    plotOutput(ns("chart"))  # Changed from echarts4rOutput
+    sliderInput(ns("n_points"), "Number of Data Points", min = 50, max = 200, value = 100),  # Slider for number of points
+    plotOutput(ns("chart"))  # Plot output
   )
 }
 
@@ -19,11 +20,14 @@ ui <- function(id) {
 server <- function(id) {
   moduleServer(id, function(input, output, session) {
     output$chart <- renderPlot({
+      # Use the slider input to determine the number of data points
+      n_points <- input$n_points
+      
       # Create random data
-      set.seed(123)
+      set.seed(123)  # Consistent seed for reproducibility
       df <- data.frame(
-        x = rnorm(100),
-        y = rnorm(100)
+        x = rnorm(n_points),  # Use n_points for x
+        y = rnorm(n_points)   # Use n_points for y
       )
       
       # Create ggplot
